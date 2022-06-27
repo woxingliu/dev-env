@@ -1,0 +1,85 @@
+version: '3.9'
+
+services:
+  mysql80:
+    image: mysql:8.0
+    container_name: mysql80
+    restart: always
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: dbname
+    volumes:
+      - /data/mysql80/data:/var/lib/mysql
+      - /data/mysql80/sql:/sql
+    ports:
+      - "13306:3306"
+    networks:
+      - my-dev-network
+
+  mariadb107:
+    image: mariadb:10.7
+    container_name: mariadb107
+    restart: no
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MARIADB_ROOT_PASSWORD: 123456
+    volumes:
+      - /data/mariadb107/data:/var/lib/mysql
+      - /data/mariadb107/sql:/sql
+      - /data/mariadb107/conf:/etc/mysql/conf.d
+    ports:
+      - "13307:3306"
+    networks:
+      - my-dev-network
+
+  postgres143:
+    image: postgres:14.3
+    container_name: postgres143
+    restart: always
+    volumes:
+      - /data/postgresql143/data:/var/lib/postgresql/data
+      - /data/postgresql143/sql:/sql
+    environment:
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: '123456'
+      POSTGRES_DB: 'dbname'
+    ports:
+      - "15432:5432"
+    networks:
+      - my-dev-network
+
+  redis62:
+    image: "redis:6.2"
+    container_name: redis62
+    restart: always
+    command: redis-server --save 60 1 --loglevel warning --requirepass 123456
+    ports:
+      - "16379:6379"
+    volumes:
+      - /data/redis62/data:/var/lib/redis
+      - /data/redis62/conf:/usr/local/etc/redis
+    networks:
+      - my-dev-network
+
+  nginx123:
+    image: nginx:1.23
+    container_name: nginx123
+    restart: always
+    ports:
+      - "18080:80"
+      - "14443:443"
+    volumes:
+      - /data/nginx123/conf/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - my-dev-network
+
+# docker network create my-dev-network
+networks:
+  my-dev-network:
+    external: true
+#  default:
+#    name: my-dev-network
+#    external: true
+
